@@ -7,13 +7,13 @@ const gravatar = require('gravatar');
 //Load User model
 const User = require('../../models/User');
 
-// @route   GET api/users/test 
-// @desc    Tests users route
-// @access  Public
+// @route  GET api/users/test 
+// @desc   Tests users route
+// @access Public
 router.get('/test', (req, res) => res.json({msg: 'User works'}));
 
-// @route GET api/users/register
-// @desc Register user
+// @route  GET api/users/register
+// @desc   Register user
 // @access Public
 router.post('/register', (req, res)=> {
   User.findOne({ email: req.body.email })
@@ -48,5 +48,35 @@ router.post('/register', (req, res)=> {
     }
   })
 });
+
+// @route  GET api/users/login
+// @desc   Login user and return JWT Token
+// @access Public
+
+router.post('/login', (req, res)=>{
+  const email = req.body.email;
+  const password = req.body.password;
+
+  // Find User by Email
+
+  User.findOne({email})
+  .then(user => {
+    // Check for user
+    if(!user){
+      return res.status(404).json({email: 'User email not found'});
+    }
+    // Check password
+    bcrypt.compare(password, user.password)
+    .then(isMatch => {
+      if(isMatch){
+        res.json({msg: 'Sucess'})
+      } else {
+        res.status(400).json({password: 'Password Incorrect'})
+      }
+    })
+
+  });
+
+})
 
 module.exports = router;
