@@ -1,26 +1,21 @@
 const express = require('express');
-const router = express.Router();
 const bcrypt = require('bcryptjs');
 const gravatar = require('gravatar');
 
-
-//Load User model
+const router = express.Router();
+// Load User model
 const User = require('../../models/User');
 
-// @route  GET api/users/test 
+// @route  GET api/users/test
 // @desc   Tests users route
 // @access Public
-router.get('/test', (req, res) => res.json({
-  msg: 'User works'
-}));
+router.get('/test', (req, res) => res.json({ msg: 'User works' }));
 
 // @route  GET api/users/register
 // @desc   Register user
 // @access Public
 router.post('/register', (req, res) => {
-  User.findOne({
-      email: req.body.email
-    })
+  User.findOne({ email: req.body.email })
     .then(user => {
       if (user) {
         return res.status(400).json({
@@ -28,11 +23,10 @@ router.post('/register', (req, res) => {
         });
       } else {
         const avatar = gravatar.url(req.body.email, {
-          s: '200', //size
-          r: 'pg', //rating
-          d: 'mm' //default
-
-        })
+          s: '200', // Size
+          r: 'pg', // Rating
+          d: 'mm' // Default
+        });
 
         const newUser = new User({
           name: req.body.name,
@@ -45,14 +39,14 @@ router.post('/register', (req, res) => {
           bcrypt.hash(newUser.password, salt, (err, hash) => {
             if (err) throw err;
             newUser.password = hash;
-            newUser.save()
+            newUser
+              .save()
               .then(user => res.json(user))
-              .catch(err => console.log(err))
-          })
+              .catch(err => console.log(err));
+          });
         });
-
       }
-    })
+    });
 });
 
 // @route  GET api/users/login
@@ -60,19 +54,17 @@ router.post('/register', (req, res) => {
 // @access Public
 
 router.post('/login', (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email } = req.body;
+  const { password } = req.body;
 
   // Find User by Email
 
-  User.findOne({
-      email
-    })
+  User.findOne({ email })
     .then(user => {
-      // Check for user
+    // Check for user
       if (!user) {
         return res.status(404).json({
-          email: 'User email not found'
+          email: 'User email not found',
         });
       }
       // Check password
@@ -80,17 +72,15 @@ router.post('/login', (req, res) => {
         .then(isMatch => {
           if (isMatch) {
             res.json({
-              msg: 'Sucess'
-            })
+              msg: 'Sucess',
+            });
           } else {
-            res.status(400).json({
-              password: 'Password Incorrect'
-            })
-          }
-        })
-
+              res.status(400).json({
+                password: 'Password Incorrect',
+              });
+            }
+        });
     });
-
-})
+});
 
 module.exports = router;
