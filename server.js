@@ -9,7 +9,7 @@ const posts = require('./routes/api/posts');
 const app = express();//init express
 
 //Body parser middleware
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 //DB configuration 
